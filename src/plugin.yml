@@ -1,0 +1,4 @@
+name: BungeeMessagingAPI
+version: 1.0.0
+author: PYRRH4
+main: be.pyrrh4.bungeemessagingapi.BungeeMessagingAPI
