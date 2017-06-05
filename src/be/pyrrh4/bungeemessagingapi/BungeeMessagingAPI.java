@@ -22,27 +22,41 @@ import com.google.common.io.ByteStreams;
 public class BungeeMessagingAPI
 {
 	// ------------------------------------------------------------
-	// Static fields and methods
+	// Fields and constructor
 	// ------------------------------------------------------------
 
-	private static Plugin pluginInstance;
-	private static ArrayList<BungeeMessagingListener> listeners = new ArrayList<BungeeMessagingListener>();
+	public Plugin plugin;
+	private ArrayList<BungeeMessagingListener> listeners = new ArrayList<BungeeMessagingListener>();
 
-	public static void registerListener(BungeeMessagingListener listener)
+	public BungeeMessagingAPI(Plugin plugin)
+	{
+		this.plugin = plugin;
+		Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
+	}
+
+	// ------------------------------------------------------------
+	// Methods
+	// ------------------------------------------------------------
+
+	public void registerListener(BungeeMessagingListener listener)
 	{
 		listeners.add(listener);
-		Bukkit.getMessenger().registerIncomingPluginChannel(pluginInstance, "BungeeCord", listener);
+		Bukkit.getMessenger().registerIncomingPluginChannel(plugin, "BungeeCord", listener);
 	}
 
-	public static void initialize(Plugin plugin) {
-		pluginInstance = plugin;
-	}
-
-	public static void terminate() {
-		Bukkit.getMessenger().unregisterIncomingPluginChannel(pluginInstance, "BungeeCord");
-		Bukkit.getMessenger().registerOutgoingPluginChannel(pluginInstance, "BungeeCord");
-		pluginInstance = null;
+	public void terminate()
+	{
+		Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, "BungeeCord");
+		Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, "BungeeCord");
 		listeners.clear();
+	}
+
+	public BungeeOutMessage createBungeeOutMessage(String subchannel, Object... args) {
+		return new BungeeOutMessage(subchannel, args);
+	}
+
+	public BungeeOutForwardMessage createBungeeOutForwardMessage(String subchannel, Object... args) {
+		return new BungeeOutForwardMessage(subchannel, args);
 	}
 
 	// ------------------------------------------------------------
@@ -81,7 +95,7 @@ public class BungeeMessagingAPI
 	// BungeeOutMessage class
 	// ------------------------------------------------------------
 
-	public static class BungeeOutMessage
+	public class BungeeOutMessage
 	{
 		// Fields and constructor
 
@@ -113,7 +127,7 @@ public class BungeeMessagingAPI
 		}
 
 		public void send(Player player) {
-			player.sendPluginMessage(pluginInstance, "BungeeCord", out);
+			player.sendPluginMessage(plugin, "BungeeCord", out);
 		}
 	}
 
@@ -121,7 +135,7 @@ public class BungeeMessagingAPI
 	// BungeeOutForwardMessage class
 	// ------------------------------------------------------------
 
-	public static class BungeeOutForwardMessage
+	public class BungeeOutForwardMessage
 	{
 		// Fields and constructor
 
@@ -167,7 +181,7 @@ public class BungeeMessagingAPI
 		}
 
 		public void send(Player player) {
-			player.sendPluginMessage(pluginInstance, "BungeeCord", out);
+			player.sendPluginMessage(plugin, "BungeeCord", out);
 		}
 	}
 
